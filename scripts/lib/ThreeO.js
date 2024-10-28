@@ -43,7 +43,7 @@ export class ThreeO {
     let resourceRemoved = 0;
     let totalResult = 0;
     if (modifier === 'normal'){
-      resourceRemoved = failures;
+      resourceRemoved = failures+empty;
       totalResult = successes - failures;
     }
     else if (modifier === 'hard'){
