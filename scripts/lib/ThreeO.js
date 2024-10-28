@@ -4,6 +4,15 @@ export class ThreeO {
   }
 
   static async roll(diceCount, modifier = 'normal') {
+    
+    const character = game.user.character;
+    const currentHP = character.system.attributes.hp.value;
+
+    if (currentHP <= 0) {
+        ui.notifications.error("У вас нет ресурса!");
+        return;
+    }
+
     let successes = 0;
     let empty = 0;
     let failures = 0;
@@ -17,10 +26,18 @@ export class ThreeO {
     });
 
     let rollMessage = "<p>";
-    rollMessage += `<strong style="font-size: large;">Бросок: (${modifier})</strong><br>`;
-    rollMessage += `<strong style="font-size: large;">-1: (${failures})</strong><br>`;
+
+    let rollTypeText = "Делает самостоятельно";
+    if (modifier === 'hard') {
+        rollTypeText = "Что-то мешает";
+    }
+    else if (modifier === 'easy') {
+        rollTypeText = "Что-то помогает";
+    }
+    rollMessage += `<strong style="font-size: large;">${rollTypeText}</strong><br>`;
+    /*rollMessage += `<strong style="font-size: large;">-1: (${failures})</strong><br>`;
     rollMessage += `<strong style="font-size: large;">0: (${empty})</strong><br>`;
-    rollMessage += `<strong style="font-size: large;">1: (${successes})</strong><br>`;
+    rollMessage += `<strong style="font-size: large;">1: (${successes})</strong><br>`;*/
     rollMessage += "</p>";
 
     let resourceRemoved = 0;
@@ -38,18 +55,24 @@ export class ThreeO {
       totalResult = successes - failures + empty;
     }
 
-    let statsMessage = `Итого нужно ресурса: ${resourceRemoved}`;
+    let statsMessage = `Затрачено ресурса: ${resourceRemoved}<br>`;
     statsMessage += `Итого результат: ${totalResult}`;
+    if (currentHP < resourceRemoved)
+    {
+      statsMessage += `<br><strong style="font-size: large;">Недостаточно ресурса, потеря сознания!</strong>`;
+    }
 
     // Добавляем кнопку в сообщение
-    let buttonId = `reduce-dice`;
-    if (true) {
-      statsMessage += `<button id="${buttonId}" data-failures="${failures}" style="margin-top: 10px; margin-bottom: 10px;">Убрать все "1" (${failures} шт.) из пула игроков</button>`;
-    }
+    // let buttonId = `reduce-dice`;
+    // if (true) {
+    //  statsMessage += `<button id="${buttonId}" data-failures="${failures}" style="margin-top: 10px; margin-bottom: 10px;">Убрать все "1" (${failures} шт.) из пула игроков</button>`;
+    //}
 
     let flavor = `${rollMessage}${statsMessage}`;
 
-    let speaker = ChatMessage.getSpeaker({ actor: game.user.character });
+    let speaker = ChatMessage.getSpeaker({ actor: character });
     let chatMessage = await roll.toMessage({ rollMode: 'publicroll', flavor, speaker });
+
+    character.applyDamage(resourceRemoved);
   }
 }  

@@ -37,6 +37,7 @@ Hooks.once('ready', function () {
   TenCandles.init();
 });
 
+/*
 Hooks.on("renderChatMessage", function (message, html, data) {
   // Check if the message is a roll
   if (message.isRoll && game.user.isGM) {
@@ -55,5 +56,5 @@ Hooks.on("renderChatMessage", function (message, html, data) {
   }else{
     html.find(`button#reduce-dice`).hide();  // Скрываем кнопку
   }
-  
 });
+  */
