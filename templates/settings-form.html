@@ -1,0 +1,19 @@
+<form>
+    <!-- Заголовок для настройки свечей -->
+    <h3>Configure Candles Lights UUID's</h3>
+  
+    <!-- Контейнер для редактирования массивов свечей -->
+    <div id="candles-list">
+      {{#each candles}}
+      <div class="form-group candle-entry" data-index="{{@index}}">
+        <label>Candle {{@index}} Lights UID:</label>
+        <input type="text" name="candle-{{@index}}" value="{{this}}" placeholder="Enter light UUIDs separated by commas" />
+      </div>
+      {{/each}}
+    </div>
+  
+    <!-- Кнопка для сохранения изменений -->
+    <div style="margin-top: 20px; text-align: right;">
+      <button type="submit">Save Changes</button>
+    </div>
+  </form>

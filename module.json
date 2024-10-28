@@ -1,0 +1,50 @@
+{
+  "id": "oxy949-threeO",
+  "title": "threeO",
+  "version": "#{VERSION}#",
+  "url": "#{URL}#",
+  "manifest": "#{MANIFEST}#",
+  "download": "#{DOWNLOAD}#",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "12"
+  },
+  "esmodules": [
+      "scripts/module.js"
+  ],
+  "scripts": [
+      "scripts/lib/lib.js"
+  ],
+  "styles": [
+      "styles/module.css"
+  ],
+  "description": "threeO",
+  "authors": [
+    {
+      "name": "Oxy949",
+      "email": "oxy949@gmail.com",
+      "url": "https://boosty.to/oxy949",
+      "discord": "oxy949",
+      "flags": {}
+    }
+  ],
+  "packs": [
+  ],
+  "relationships": {
+    "requires": [
+    ],
+    "recommends": [
+      {
+        "id": "dice-so-nice",
+        "type": "module",
+        "compatibility": {}
+      },
+      {
+        "id": "foundryvtt-show-me-the-roll",
+        "type": "module",
+        "manifest": "https://github.com/Oxy949/foundryvtt-show-me-the-roll/releases/latest/download/module.json",
+        "compatibility": {}
+      }
+    ]
+  }
+}
