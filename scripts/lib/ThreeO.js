@@ -80,8 +80,4 @@ export class ThreeO {
     let speaker = ChatMessage.getSpeaker({ actor: game.user.character });
     let chatMessage = await roll.toMessage({ rollMode: 'publicroll', flavor, speaker });
   }
-
-  static async rollPlayer(withHope) {
-    await game.candles.roll(true, withHope);
-  }
 }  
