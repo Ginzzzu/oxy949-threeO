@@ -1,7 +1,7 @@
 # oxy949-threeO
 
 ## How to install 
-1. Copy `https://github.com/Oxy949/oxy949-threeO/releases/latest/download/module.json` 
+1. Copy `https://github.com/Ginzzzu/oxy949-threeO/releases/latest/download/module.json` 
 2. Paste it in your Foundry VTT, wait for install
 3. Enable the module in your world
 4. Import the Ten Candles `Scene`, `Macro`, `Tables` and (optionally) `Jurnals` Compendiums. **Make sure to check "Keep Document IDs?" when importing!!**
