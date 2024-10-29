@@ -27,7 +27,7 @@ export class ThreeO {
 
     let rollMessage = "<p>";
 
-    let rollTypeText = "Делает самостоятельно";
+    let rollTypeText = "Действует самостоятельно";
     if (modifier === 'hard') {
         rollTypeText = "Что-то мешает";
     }
@@ -56,7 +56,7 @@ export class ThreeO {
     }
 
     let statsMessage = `Затрачено ресурса: ${resourceRemoved}<br>`;
-    statsMessage += `Итого результат: ${totalResult}`;
+    statsMessage += `Успешность: ${totalResult}`;
     if (currentHP < resourceRemoved)
     {
       statsMessage += `<br><strong style="font-size: large;">Недостаточно ресурса, потеря сознания!</strong>`;
