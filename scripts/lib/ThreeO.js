@@ -27,19 +27,19 @@ export class ThreeO {
 
     let rollMessage = "<p>";
 //Определение типа действия (1-2-3 кубика)
-    let rollDiceText = "Обычно";
-    if (diceCount = "1") {rollDiceText = "Осторожно";
+    let rollDiceText = "Действует как обычно, ";
+    if (diceCount == '1') {rollDiceText = "Действует осторожно, ";
     }
-    else if (diceCount = "3") {rollDiceText = "Опасно";}
+    else if (diceCount == '3') {rollDiceText = "Действует опасно, ";}
 //Конец определения типа действия
-    let rollTypeText = "Действует самостоятельно";
+    let rollTypeText = "самостоятельно";
     if (modifier === 'hard') {
-        rollTypeText = "Что-то мешает";
+        rollTypeText = "но что-то мешает";
     }
     else if (modifier === 'easy') {
-        rollTypeText = "Что-то помогает";
+        rollTypeText = "но что-то помогает";
     }
-    rollMessage += `<strong style="font-size: large;">${rollTypeText}: ${rollDiceText}</strong><br>`;
+    rollMessage += `<strong style="font-size: large;">${rollDiceText} ${rollTypeText}</strong><br>`;
     /*rollMessage += `<strong style="font-size: large;">-1: (${failures})</strong><br>`;
     rollMessage += `<strong style="font-size: large;">0: (${empty})</strong><br>`;
     rollMessage += `<strong style="font-size: large;">1: (${successes})</strong><br>`;*/
