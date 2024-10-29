@@ -60,8 +60,8 @@ export class ThreeO {
       totalResult = successes - failures + empty;
     }
 
-    let statsMessage = `Затрачено ресурса: ${resourceRemoved}<br>`;
-    statsMessage += `Успешность: ${totalResult}`;
+    let statsMessage = `<strong style="color: red;">Затрачено ресурса: ${resourceRemoved}<br></strong>`;
+    statsMessage += `<strong style="font-size: medium;">Успешность: ${totalResult}</strong>`;
     if (currentHP < resourceRemoved)
     {
       statsMessage += `<br><strong style="font-size: large;">Недостаточно ресурса, потеря сознания!</strong>`;
