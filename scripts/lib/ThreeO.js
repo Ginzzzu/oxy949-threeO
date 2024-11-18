@@ -75,11 +75,16 @@ export class ThreeO {
     // Сообщение в чат и автоматическая анимация кубиков
     await roll.toMessage({ rollMode: 'publicroll', flavor, speaker });
 
-    // После завершения анимации наносим урон с задержкой
-    Hooks.once("diceSoNiceRollComplete", () => {
-        setTimeout(() => {
-            character.applyDamage(resourceRemoved);
-        }, 500); // Задержка в миллисекундах (500 = 0.5 секунды)
-    });
+    // Анимация кубиков через Dice So Nice
+    if (game.dice3d) {
+      // После завершения анимации наносим урон с задержкой
+      Hooks.once("diceSoNiceRollComplete", () => {
+          setTimeout(() => {
+              character.applyDamage(resourceRemoved);
+          }, 500); // Задержка в миллисекундах (500 = 0.5 секунды)
+      });
+    } else {
+      character.applyDamage(resourceRemoved);
+    }
   }
 }
