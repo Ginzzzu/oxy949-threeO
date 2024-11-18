@@ -78,6 +78,15 @@ export class ThreeO {
     let speaker = ChatMessage.getSpeaker({ actor: character });
     let chatMessage = await roll.toMessage({ rollMode: 'publicroll', flavor, speaker });
 
-    character.applyDamage(resourceRemoved);
+    // Если есть модуль Dice So Nice
+    if (game.dice3d) {
+        game.dice3d.showForRoll(roll, game.user, true, null, false).then(() => {
+            // После завершения анимации наносим урон
+            character.applyDamage(resourceRemoved);
+        });
+    } else {
+        // Если Dice So Nice нет, сразу наносим урон
+        character.applyDamage(resourceRemoved);
+    }
   }
 }  
