@@ -72,18 +72,14 @@ export class ThreeO {
     let flavor = `${rollMessage}${statsMessage}`;
     let speaker = ChatMessage.getSpeaker({ actor: character });
 
-    // Сообщение в чат, но без автоматической анимации кубиков
-    await roll.toMessage({ rollMode: 'publicroll', flavor, speaker, flags: { "core.no3d": true } });
+    // Сообщение в чат и автоматическая анимация кубиков
+    await roll.toMessage({ rollMode: 'publicroll', flavor, speaker });
 
-    // Анимация кубиков через Dice So Nice
-    if (game.dice3d) {
-        game.dice3d.showForRoll(roll, game.user, true, null, false).then(() => {
-            // После завершения анимации наносим урон
+    // После завершения анимации наносим урон с задержкой
+    Hooks.once("diceSoNiceRollComplete", () => {
+        setTimeout(() => {
             character.applyDamage(resourceRemoved);
-        });
-    } else {
-        // Если Dice So Nice отключен, сразу наносим урон
-        character.applyDamage(resourceRemoved);
-    }
+        }, 500); // Задержка в миллисекундах (500 = 0.5 секунды)
+    });
   }
 }
