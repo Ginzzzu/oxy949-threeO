@@ -1,6 +1,6 @@
 {
   "id": "oxy949-threeO",
-  "title": "threeO",
+  "title": "Ginzzzu's threeO",
   "version": "#{VERSION}#",
   "url": "#{URL}#",
   "manifest": "#{MANIFEST}#",
@@ -18,13 +18,13 @@
   "styles": [
       "styles/module.css"
   ],
-  "description": "threeO",
+  "description": "Ginzzzu's threeO",
   "authors": [
     {
-      "name": "Oxy949",
-      "email": "oxy949@gmail.com",
-      "url": "https://boosty.to/oxy949",
-      "discord": "oxy949",
+      "name": "Ginzzzu, Oxy949",
+      "email": "stepangrakov@gmail.com",
+      "url": "",
+      "discord": "ginzzzu",
       "flags": {}
     }
   ],
