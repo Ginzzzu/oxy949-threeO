@@ -78,14 +78,14 @@ export class ThreeO {
             totalResult = successes - failures + empty;
         }
     }
-
+    const resourceName = game.settings.get("oxy949-threeO", "resourceName");
     let statsMessage = ``;
     if (resourceRemoved > 0) {
-        statsMessage += `<strong style="color: red;">Затрачено ресурса: ${resourceRemoved}<br></strong>`;     
+        statsMessage += `<strong style="color: red;">Потеря ${resourceName}: ${resourceRemoved}<br></strong>`;     
     } else if (resourceRemoved < 0) {
-        statsMessage += `<strong style="color: green;">Восстановлено ресурса: ${Math.abs(resourceRemoved)}<br></strong>`;
+        statsMessage += `<strong style="color: green;">Восстановление ${resourceName}: ${Math.abs(resourceRemoved)}<br></strong>`;
     } else {
-        statsMessage += `<strong style="color: grey;">Ресурс остался прежним<br></strong>`; 
+        statsMessage += `<strong style="color: grey;">Состояние не изменилось<br></strong>`; 
     }
     
     statsMessage += `<strong style="font-size: medium;">Успешность: ${totalResult}</strong>`;
