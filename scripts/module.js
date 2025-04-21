@@ -24,6 +24,7 @@ Hooks.once('setup', function () {
     // Do anything after initialization but before ready
       operations = {
         roll: ThreeO.roll,
+        useCharm: ThreeO.useCharm
       };
 
       //@ts-ignore
