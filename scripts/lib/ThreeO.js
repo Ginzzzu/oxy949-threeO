@@ -127,7 +127,7 @@ export class ThreeO {
       }
   
       const modulename = "oxy949-threeO";
-      const itemName = "Талисман";
+      const itemName = game.settings.get(modulename, "itemName");
   
       const item = character.items.find(i => i.name === itemName && i.type === "consumable");
   
@@ -158,20 +158,19 @@ export class ThreeO {
   
       // Формирование текста сообщения
       let rollMessage = "<p>";
-      let rollDiceText = "Талисман обычно";
-  
-      if (diceCount === '1') {
-        rollDiceText = "Талисман осторожно";
-      } else if (diceCount === '3') {
-        rollDiceText = "Талисман опасно";
+     
+      rollMessage += `<strong style="font-size: large; color: purple">Использует свой талисман...</strong><br>`;
+      if (qty - failures >= 3) {
+        rollMessage += `<strong style="font-size: medium;">...он поможет в любой ситуации...</strong><br>`;
       }
-  
-      rollMessage += `<strong style="font-size: large;">${rollDiceText}</strong><br>`;
-      if (qty - failures > 0) {
-        rollMessage += `<strong style="font-size: large;">Осталось зарядов талисмана:${qty - failures}</strong><br>`;
+      else if (qty - failures >= 2) {
+        rollMessage += `<strong style="font-size: medium;">...хм, в нем что-то поменялось...</strong><br>`;
+      }
+      else if (qty - failures >= 1) {
+        rollMessage += `<strong style="font-size: medium;">...с ним явно что-то не так...</strong><br>`;
       }
       else {
-        rollMessage += `<strong style="font-size: large;">Талисман всё</strong><br>`;
+        rollMessage += `<strong style="font-size: medium;">...но больше он не поможет!</strong><br>`;
       }
       rollMessage += "</p>";
   

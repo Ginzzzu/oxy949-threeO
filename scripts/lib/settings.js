@@ -20,5 +20,15 @@ export const registerSettings = function() {
 			type: String,
 			default: "рассудка"
 		  
-	})
+	});
+
+	game.settings.register(modulename, 'itemName', {
+		name: "Талисман",
+		hint: "Введите название важного для персонажа предмета в именительном падеже. Не забудьте также назвать предмет в соответствующем чарнике!",
+		scope: "world",
+		config: true,
+		type: String,
+		default: "Талисман"
+	  
+})
 }
