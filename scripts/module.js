@@ -38,6 +38,71 @@ Hooks.once('ready', function () {
   TenCandles.init();
 });
 
+/* ------------------------------------ */
+/* Создаем библиотеку и макрос						*/
+/* ------------------------------------ */
+Hooks.once("ready", async () => {
+  const pack = game.packs.get("oxy949-threeO.macros");
+  if (!pack) {
+    console.error("❌ Не найден компендий oxy949-threeO.macros");
+    return;
+  }
+
+  // Загружаем содержимое компендия
+  await pack.getDocuments();
+  let existing = pack.index.find(e => e.name === "Действовать!");
+  if (existing) return; // Уже есть
+
+  console.log("➕ Добавляем макрос 'Действовать!' в компендий...");
+
+  const macroData = {
+    name: "Действовать!",
+    type: "script",
+    img: "icons/magic/control/silhouette-hold-change-green.webp",
+    command: `const character1 = game.user.character;
+
+new Dialog({
+  title: "ВРЕМЯ ДЕЙСТВОВАТЬ!",
+  content:\`
+<p>
+  <select id="actionType" style="width: 100%;">
+    <option value="normal">Действую самостоятельно</option>
+    <option value="easy">Есть преимущество: кто-то или что-то помогает</option>
+    <option value="hard">Есть помеха: кто-то или что-то мешает</option>
+  </select>
+</p>
+\`,
+  buttons: {
+    option1: {
+      label: "Осторожно",
+      callback: (html) => {
+        const actionType = html.find("#actionType").val();
+        game.threeO.roll(1, actionType )
+      }
+    },
+    option2: {
+      label: "Обычно",
+      callback: (html) => {
+        const actionType = html.find("#actionType").val();
+        game.threeO.roll(2, actionType )
+      }
+    },
+    option3: {
+      label: "Опасно",
+      callback: (html) => {
+        const actionType = html.find("#actionType").val();
+        game.threeO.roll(3, actionType )
+      }
+    }
+  },
+  default: "option2"
+}).render(true);`
+  };
+
+  await Macro.create(macroData, { pack: pack.collection });
+  console.log("✅ Макрос 'Действовать!' создан в компендии ThreeO Macros");
+});
+
 /*
 Hooks.on("renderChatMessage", function (message, html, data) {
   // Check if the message is a roll

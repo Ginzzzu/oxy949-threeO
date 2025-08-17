@@ -1,0 +1,228 @@
+/* Основная сетка */
+.sheet-content {
+  display: flex;
+  height: 100%;
+}
+
+/* Левая колонка: портрет */
+.portrait-col {
+  flex: 1; /* 1 часть из 3 */
+  max-width: 33%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+}
+
+.portrait-img {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: cover;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 0 0px rgba(0,0,0,0.5);
+}
+
+/* Правая колонка: инфо */
+.info-col {
+  flex: 2; /* занимает 2/3 ширины */
+  padding: 15px;
+  margin: 10px; /* отступ со всех сторон */
+  
+  background: rgba(168, 168, 168, 0.9); /* чуть плотнее фон */
+  border-radius: 12px; /* более мягкие скругления */
+  
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* лёгкая тень */
+}
+
+/* Поля без рамок */
+.char-name input.no-border,
+.token input.no-border {
+  border: none;
+  background: transparent;
+  font-size: 2em;
+  width: 100%;
+  outline: none;
+  box-shadow: none;
+}
+
+/* Имя + HP в строку */
+.name-hp-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  flex: 0 0 auto; /* чтобы секция не тянулась по высоте */
+}
+
+/* Имя персонажа */
+.name-hp-row .char-name {
+  flex: 1;         /* занимает всё доступное место */
+  margin-right: 15px;
+}
+
+.name-hp-row .char-name input {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 8px;
+  padding: 6px 8px;      /* чуть больше внутренний отступ */
+  line-height: 1.4;      /* исправляет обрезание букв с хвостами */
+  font-size: 26px;       /* читаемый размер */
+  font-weight: bold;       /* читаемый размер */
+  height: auto;          /* чтобы браузер сам подстроил */
+}
+
+/* Поле HP */
+.name-hp-row .hp-field {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* промежуток между числом и слэшем */
+  white-space: nowrap;
+  flex: 0 0 auto; /* не растягивается */
+}
+
+.hp-input {
+  width: 55px; /* фиксированная ширина для аккуратных цифр */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 2px 4px;
+  text-align: center;
+}
+
+/* Инвентарь */
+
+.actor-sheet .sheet-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.inventory-section {
+  background: #f8f9fa;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 10px;
+  margin-top: 10px;
+  flex: 0 0 auto;
+}
+
+.inventory-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  /* ограничиваем высоту и даем скролл */
+  max-height: 200px; /* можно подогнать под твой экран */
+  overflow-y: auto;
+}
+
+.inventory-title {
+  margin: 0 0 8px 0;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.inventory-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.drag-handle {
+  cursor: grab;
+  user-select: none;
+  padding: 0 5px;
+  font-size: 14px;
+  color: #666;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.inventory-row[draggable="true"] {
+  cursor: grab;
+}
+.inventory-row[draggable="true"]:active {
+  cursor: grabbing;
+  opacity: 0.7;
+}
+
+.inventory-input {
+  flex: 1;                /* занимает всё доступное место */
+  border-radius: 8px;
+  border: 1px solid #bbb;
+  padding: 5px;
+  margin-right: 8px;      /* отступ до кнопки */
+}
+
+.inventory-remove {
+  flex: 0 0 30px;         /* фиксированная ширина */
+  height: 30px;           /* фиксированная высота, чтобы не растягивалась */
+  border-radius: 8px;
+  border: 1px solid #888;
+  background: #f5f5f5;
+  cursor: pointer;
+  text-align: center;
+  padding: 0;
+  line-height: 28px;      /* центрируем крестик по вертикали */
+  transition: background 0.2s;
+}
+
+.inventory-remove:hover {
+  background: #e0e0e0;
+}
+
+.inventory-add {
+  display: inline-block;
+  padding: 6px 14px;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: 1px solid #888;
+  background: #eee;
+  cursor: pointer;
+  transition: background 0.2s;
+  align-self: flex-start; /* кнопка прижимается к контенту */  
+}
+
+.inventory-add:hover {
+  background: #ddd;
+}
+
+.additional-info-section {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  margin-bottom: 10px;
+  height: 200px;           /* задаём минимальную высоту секции */
+}
+
+.additional-info-section textarea {
+  width: 100%;
+  height: 100%;            /* растягивается по всей высоте секции */
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid #bbb;
+  padding: 5px;
+  resize: vertical;        /* пользователь может менять высоту вручную */
+}
+
+.action-button-row {
+  margin-top: 8px;
+  text-align: left;
+    flex: 0 0 auto; /* не растягивается */
+}
+
+.action-button {
+  padding: 2px 2px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #1e743b;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.action-button:hover {
+  background: #26b455;
+}

@@ -1,0 +1,60 @@
+<form class="sheet actor-sheet flexcol" autocomplete="off"
+      style="{{#if cover}}background-image: url('{{cover}}');{{/if}} background-size: cover; background-position: center;">
+
+  <div class="sheet-content flexrow">
+
+    <!-- Левая колонка: портрет -->
+    <div class="portrait-col">
+      <img src="{{actor.img}}" data-edit="img" title="{{actor.name}}" class="portrait-img"/>
+    </div>
+
+    <!-- Правая колонка -->
+    <div class="info-col flexcol">
+
+      <!-- Имя + HP в одной строке -->
+      <div class="name-hp-row flexrow">
+        <div class="char-name flex1">
+          <input name="name" type="text" value="{{actor.name}}" placeholder="Имя персонажа" class="no-border"/>
+        </div>
+        <div class="hp-field flex0">
+          <label><strong>Запас {{resourceName}}:</strong></label>
+          {{#if isGM}}
+            <input type="number" name="system.attributes.hp.value" value="{{actor.system.attributes.hp.value}}" class="hp-input"/>
+            /
+            <input type="number" name="system.attributes.hp.max" value="{{actor.system.attributes.hp.max}}" class="hp-input"/>
+          {{else}}
+          {{#if resourceShow}}
+            {{actor.system.attributes.hp.value}} / {{actor.system.attributes.hp.max}}
+            {{else}}
+            <label><strong>неизвестно</strong></label>
+            {{/if}}
+          {{/if}}
+        </div>
+      </div>
+
+<!-- Кнопка действия 
+<div class="action-button-row">
+  <button type="button" class="action-button">🎲 Действовать!</button>
+</div>      
+-->
+      <!-- Инвентарь -->
+<div class="additional-info-section">
+  <label>Информация и заметки:</label>
+  <textarea name="flags.oxy949-threeO.additionalInfo">{{additionalInfo}}</textarea>
+</div>
+
+<div class="inventory-section">
+  <div class="inventory-title">Инвентарь | Задачи </div>
+{{#each inventory as |item i|}}
+  <div class="inventory-row" data-index="{{i}}">
+    <span class="drag-handle" draggable="true">☰</span>
+    <input type="text" name="flags.oxy949-threeO.inventory.{{i}}" value="{{item}}" />
+    <button type="button" class="inventory-remove" data-index="{{i}}">×</button>
+  </div>
+{{/each}}
+  <button type="button" class="inventory-add">Добавить</button>
+</div>
+
+    </div>
+  </div>
+</form>
