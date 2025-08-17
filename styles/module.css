@@ -217,12 +217,51 @@
 .action-button {
   padding: 2px 2px;
   border-radius: 8px;
-  border: 1px solid #ccc;
-  background: #1e743b;
+  border: 0px solid #ccc;
+  background: #2e8f4e;
   cursor: pointer;
   transition: background 0.2s;
+  flex: 0 0 auto; /* чтобы секция не тянулась по высоте */  
 }
 
 .action-button:hover {
   background: #26b455;
+}
+
+.character-action {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  flex: 0 0 auto; /* чтобы секция не тянулась по высоте */    
+}
+
+.character-action label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.character-action select {
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.character-action .action-buttons {
+  display: flex;
+  gap: 6px; /* расстояние между кнопками */
+}
+
+.character-action .action-buttons button {
+  flex: 1; /* каждая кнопка растягивается равномерно */
+  padding: 6px;
+  font-weight: bold;
+  border: 1px solid #888;
+  border-radius: 4px;
+  background-color: #222;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.character-action .action-buttons button:hover {
+  background-color: #444;
 }

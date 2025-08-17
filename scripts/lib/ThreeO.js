@@ -247,8 +247,8 @@ class ThreeOActorSheet extends ActorSheet {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["threeO", "sheet", "actor"],
       template: "modules/oxy949-threeO/templates/actor-sheet.html",
-      width: 835,
-      height: 420,
+      width: 980,
+      height: 550,
       submitOnChange: true   // теперь изменения сохраняются при blur
     });
   }
@@ -287,23 +287,21 @@ class ThreeOActorSheet extends ActorSheet {
     const modulename = "oxy949-threeO";
 
 // Кнопка "Действовать"
-html.on("click", ".action-button", async (ev) => {
-  ev.preventDefault();
+ html.find(".action-option").click(async ev => {
+    ev.preventDefault();
 
-  const macroId = game.settings.get(modulename, "actionMacroId");
-  const macro = game.macros.get(macroId);
+    const button = ev.currentTarget;
+    const actionValue = Number(button.dataset.value); // 1, 2, 3
+    const actionType = html.find("#actionType").val(); // выбранный тип действия
 
-  if (macro) {
-    try {
-      await macro.execute({}); // макрос работает сам по себе
-    } catch (err) {
-      console.error(err);
-      ui.notifications.error("Ошибка при выполнении макроса.");
+    if (!game.threeO?.roll) {
+      ui.notifications.error("Система действий не инициализирована.");
+      return;
     }
-  } else {
-    ui.notifications.warn("Макрос с указанным ID не найден.");
-  }
-  });    
+
+    // Выполняем функцию roll, как в макросе
+    game.threeO.roll(actionValue, actionType);
+  });
 
     // === Добавить ===
   html.on("click", ".inventory-add", async (ev) => {

@@ -38,32 +38,27 @@ Hooks.once('ready', function () {
   TenCandles.init();
 });
 
-/* ------------------------------------ */
-/* Создаем библиотеку и макрос						*/
-/* ------------------------------------ */
+
 Hooks.once("ready", async () => {
-  const pack = game.packs.get("oxy949-threeO.macros");
-  if (!pack) {
-    console.error("❌ Не найден компендий oxy949-threeO.macros");
-    return;
-  }
+  if (!game.user.isGM) return; // только для ГМа
 
-  // Загружаем содержимое компендия
-  await pack.getDocuments();
-  let existing = pack.index.find(e => e.name === "Действовать!");
-  if (existing) return; // Уже есть
+  // Проверяем, есть ли уже макрос с таким именем
+  let macroName = "Действовать!";
+  let macro = game.macros.find(m => m.name === macroName);
 
-  console.log("➕ Добавляем макрос 'Действовать!' в компендий...");
-
-  const macroData = {
-    name: "Действовать!",
-    type: "script",
-    img: "icons/magic/control/silhouette-hold-change-green.webp",
-    command: `const character1 = game.user.character;
+  if (!macro) {
+    // Создаем новый макрос
+    macro = await Macro.create({
+      name: macroName,
+      type: "script",
+      scope: "global",
+      img: "icons/magic/control/silhouette-hold-change-green.webp",
+      command: `
+const character1 = game.user.character;
 
 new Dialog({
   title: "ВРЕМЯ ДЕЙСТВОВАТЬ!",
-  content:\`
+  content: \`
 <p>
   <select id="actionType" style="width: 100%;">
     <option value="normal">Действую самостоятельно</option>
@@ -77,32 +72,38 @@ new Dialog({
       label: "Осторожно",
       callback: (html) => {
         const actionType = html.find("#actionType").val();
-        game.threeO.roll(1, actionType )
+        game.threeO.roll(1, actionType );
       }
     },
     option2: {
       label: "Обычно",
       callback: (html) => {
         const actionType = html.find("#actionType").val();
-        game.threeO.roll(2, actionType )
+        game.threeO.roll(2, actionType );
       }
     },
     option3: {
       label: "Опасно",
       callback: (html) => {
         const actionType = html.find("#actionType").val();
-        game.threeO.roll(3, actionType )
+        game.threeO.roll(3, actionType );
       }
     }
   },
   default: "option2"
-}).render(true);`
-  };
+}).render(true);
+`
+    });
 
-  await Macro.create(macroData, { pack: pack.collection });
-  console.log("✅ Макрос 'Действовать!' создан в компендии ThreeO Macros");
+    ui.notifications.info("Макрос 'Действовать!' создан и добавлен в панель макросов.");
+  }
+
+  // Кладем макрос в слот 1 хотбара ГМа
+  if (!game.user.hotbar) return;
+  if (!game.user.hotbar[1]) {
+    await game.user.assignHotbarMacro(macro, 1);
+  }
 });
-
 /*
 Hooks.on("renderChatMessage", function (message, html, data) {
   // Check if the message is a roll

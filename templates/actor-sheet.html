@@ -32,11 +32,23 @@
         </div>
       </div>
 
-<!-- Кнопка действия 
-<div class="action-button-row">
-  <button type="button" class="action-button">🎲 Действовать!</button>
-</div>      
--->
+<!-- Выбор действия -->
+<div class="character-action">
+  <label for="actionType">Тип действия:</label>
+  <select id="actionType" style="width: 100%;">
+    <option value="normal">Действую самостоятельно</option>
+    <option value="easy">Есть преимущество: кто-то или что-то помогает</option>
+    <option value="hard">Есть помеха: кто-то или что-то мешает</option>
+  </select>
+
+  <div class="action-buttons">
+    <button type="button" class="action-option" data-value="1">Осторожно</button>
+    <button type="button" class="action-option" data-value="2">Обычно</button>
+    <button type="button" class="action-option" data-value="3">Опасно</button>
+  </div>
+</div>
+
+
       <!-- Инвентарь -->
 <div class="additional-info-section">
   <label>Информация и заметки:</label>
