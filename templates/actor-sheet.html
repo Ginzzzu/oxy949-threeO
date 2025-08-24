@@ -4,9 +4,18 @@
   <div class="sheet-content flexrow">
 
     <!-- Левая колонка: портрет -->
-    <div class="portrait-col">
-      <img src="{{actor.img}}" data-edit="img" title="{{actor.name}}" class="portrait-img"/>
-    </div>
+<div class="portrait-col">
+  <!-- Портрет -->
+  <img src="{{document.img}}"
+       data-edit="img"
+       title="{{document.name}}"
+       class="portrait-img"/>
+
+  <!-- Кнопка смены токена (только для ГМа) -->
+  {{#if isGM}}
+    <button type="button" class="change-token-btn">Сменить токен</button>
+  {{/if}}
+</div>
 
     <!-- Правая колонка -->
     <div class="info-col flexcol">
@@ -33,6 +42,7 @@
       </div>
 
 <!-- Выбор действия -->
+{{#if actionList}} 
 <div class="character-action">
   <label for="actionType">Тип действия:</label>
   <select id="actionType" style="width: 100%;">
@@ -47,16 +57,41 @@
     <button type="button" class="action-option" data-value="3">Опасно</button>
   </div>
 </div>
+{{/if}}
 
-
-      <!-- Инвентарь -->
+      <!-- Информация -->
 <div class="additional-info-section">
-  <label>Информация и заметки:</label>
-  <textarea name="flags.oxy949-threeO.additionalInfo">{{additionalInfo}}</textarea>
+  <nav class="sheet-tabs tabs" data-group="notes">
+    <a class="item" data-tab="note1">Главное</a>
+    <a class="item" data-tab="note2">Второстепенное</a>
+    <a class="item" data-tab="note3">Остальное</a>
+  </nav>
+
+  <section class="tab" data-group="notes" data-tab="note1">
+    <prose-mirror name="flags.oxy949-threeO.additionalInfo1"
+                  class="editor"
+                  value="{{additionalInfo1}}">
+    </prose-mirror>
+  </section>
+
+  <section class="tab" data-group="notes" data-tab="note2">
+    <prose-mirror name="flags.oxy949-threeO.additionalInfo2"
+                  class="editor"
+                  value="{{additionalInfo2}}">
+    </prose-mirror>
+  </section>
+
+  <section class="tab" data-group="notes" data-tab="note3">
+    <prose-mirror name="flags.oxy949-threeO.additionalInfo3"
+                  class="editor"
+                  value="{{additionalInfo3}}">
+    </prose-mirror>
+  </section>
 </div>
 
+      <!-- Инвентарь -->
 <div class="inventory-section">
-  <div class="inventory-title">Инвентарь | Задачи </div>
+  <div class="inventory-title">{{itemsName}}</div>
 {{#each inventory as |item i|}}
   <div class="inventory-row" data-index="{{i}}">
     <span class="drag-handle" draggable="true">☰</span>

@@ -1,0 +1,52 @@
+<form class="sheet actor-sheet flexcol"
+      autocomplete="off"
+      style="{{#if cover}}background-image: url('{{cover}}');{{/if}} background-size: cover; background-position: center;">
+
+  <div class="sheet-content flexcol">
+
+    <!-- Верхняя панель: портрет, имя, ресурс -->
+    <div class="npc-header flexrow">
+
+      <!-- Портрет -->
+      <div class="npc-portrait">
+        <img src="{{document.img}}"
+             data-edit="img"
+             title="{{document.name}}"
+             class="portrait-img"/>
+        {{#if isGM}}
+          <button type="button" class="change-token-btn">Сменить токен</button>
+        {{/if}}
+      </div>
+
+      <!-- Имя и ресурс -->
+      <div class="npc-main-info flexcol">
+        <input name="name" type="text" value="{{actor.name}}" placeholder="Имя NPC" class="no-border"/>
+
+        <div class="npc-hp-row">
+          <label><strong>Запас {{resourceName}}:</strong></label>
+          {{#if isGM}}
+            <input type="number" name="system.attributes.hp.value" value="{{actor.system.attributes.hp.value}}" class="hp-input"/>
+            /
+            <input type="number" name="system.attributes.hp.max" value="{{actor.system.attributes.hp.max}}" class="hp-input"/>
+          {{else}}
+            {{#if resourceShow}}
+              {{actor.system.attributes.hp.value}} / {{actor.system.attributes.hp.max}}
+            {{else}}
+              <label><strong>неизвестно</strong></label>
+            {{/if}}
+          {{/if}}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Заметки -->
+    <div class="npc-notes flexcol">
+      <prose-mirror name="flags.oxy949-threeO.gmNotes"
+                    class="editor"
+                    value="{{gmNotes}}">
+      </prose-mirror>
+    </div>
+
+  </div>
+</form>

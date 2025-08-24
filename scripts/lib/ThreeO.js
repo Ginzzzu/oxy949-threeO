@@ -241,7 +241,7 @@ static async roll(diceCount, modifier = 'normal') {
     }
   }
   
-  //Активируем кастомный чарник
+  //Активируем кастомный чарник персонажа игрока
 class ThreeOActorSheet extends ActorSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
@@ -259,6 +259,13 @@ class ThreeOActorSheet extends ActorSheet {
 
     const modulename = "oxy949-threeO";
     context.resourceName = game.settings.get(modulename, "resourceName");
+    context.actionList = game.settings.get(modulename, "actionList");
+    context.resourceShow = game.settings.get(modulename, "resourceShow");
+    context.itemsName = game.settings.get(modulename, "itemsName"); 
+    context.additionalInfo1 = this.actor.getFlag(modulename, "additionalInfo1") ?? "";
+    context.additionalInfo2 = this.actor.getFlag(modulename, "additionalInfo2") ?? "";
+    context.additionalInfo3 = this.actor.getFlag(modulename, "additionalInfo3") ?? "";  
+    context.gmNotes = this.actor.getFlag("oxy949-threeO", "gmNotes") ?? "";             
     context.isGM = game.user.isGM;
 
     // cover.jpg
@@ -286,8 +293,31 @@ class ThreeOActorSheet extends ActorSheet {
     super.activateListeners(html);
     const modulename = "oxy949-threeO";
 
-// Кнопка "Действовать"
- html.find(".action-option").click(async ev => {
+  // ------------------------
+  // Кнопка смены токена в чарнике
+  // ------------------------
+  html.find(".change-token-btn").on("click", async ev => {
+  ev.preventDefault();
+
+  // Открыть диалог выбора файла
+  const fp = new FilePicker({
+    type: "image",
+    current: this.actor.prototypeToken.texture.src,
+    callback: async (path) => {
+      await this.actor.update({ "prototypeToken.texture.src": path });
+      ui.notifications.info("Токен изменён.");
+    },
+    top: this.position.top + 40,
+    left: this.position.left + 10
+  });
+  fp.render(true);
+});    
+
+  // ------------------------
+  // Обработчики действий
+  // ------------------------
+  // Используем делегирование, чтобы работало даже если контент перерисуется
+  html.on("click", ".action-option", async ev => {
     ev.preventDefault();
 
     const button = ev.currentTarget;
@@ -299,9 +329,23 @@ class ThreeOActorSheet extends ActorSheet {
       return;
     }
 
-    // Выполняем функцию roll, как в макросе
     game.threeO.roll(actionValue, actionType);
   });
+
+  // ------------------------
+  // Вкладки (Notes)
+  // ------------------------
+  // Убедимся, что Tabs берётся из актуального API Foundry
+  const TabsCls = foundry?.applications?.api?.Tabs ?? window.Tabs;
+
+  this._tabs = this._tabs || {};
+  this._tabs.notes = new TabsCls({
+    navSelector: ".sheet-tabs",
+    contentSelector: ".additional-info-section",
+    initial: "note1"
+  });
+  this._tabs.notes.bind(html[0]);
+
 
     // === Добавить ===
   html.on("click", ".inventory-add", async (ev) => {
@@ -392,11 +436,64 @@ html.find(".inventory-row").on("drop", async (ev) => {
   }
 }
 
-// Регистрация листа
+// --- Упрощённый лист (NPC) ---
+class ThreeOGMActorSheet extends ActorSheet {
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      classes: ["threeO", "sheet", "actor", "gm"],
+      template: "modules/oxy949-threeO/templates/gm-actor-sheet.html",
+      width: 450,
+      height: 750,
+      submitOnChange: true
+    });
+  }
+
+  async getData(options) {
+    const context = await super.getData(options);
+    const modulename = "oxy949-threeO";
+
+    context.isGM = game.user.isGM;
+    context.gmNotes = this.actor.getFlag(modulename, "gmNotes") ?? "";
+    context.resourceName = game.settings.get(modulename, "resourceName");    
+
+    // cover.jpg
+    const coverPath = `worlds/${game.world.id}/cover.jpg`;
+    try { await fetch(coverPath, { method: "HEAD" }); context.cover = coverPath; }
+    catch { context.cover = null; }
+
+    return context;
+  }
+
+  activateListeners(html) {
+    super.activateListeners(html);
+
+    // Кнопка смены токена
+    html.find(".change-token-btn").on("click", async ev => {
+      ev.preventDefault();
+      const fp = new FilePicker({
+        type: "image",
+        current: this.actor.prototypeToken.texture.src,
+        callback: async (path) => {
+          await this.actor.update({ "prototypeToken.texture.src": path });
+          ui.notifications.info("Токен изменён.");
+        }
+      });
+      fp.render(true);
+    });
+  }
+}
+
+// --- Регистрация обоих листов ---
 Hooks.once("init", function() {
-  console.log("ThreeO | Регистрация кастомного бланка персонажа");
+  console.log("ThreeO | Регистрация кастомных бланков");
+
   Actors.registerSheet("threeO", ThreeOActorSheet, {
     types: ["character"],
+    makeDefault: true
+  });
+
+  Actors.registerSheet("threeO", ThreeOGMActorSheet, {
+    types: ["npc"],
     makeDefault: true
   });
 });

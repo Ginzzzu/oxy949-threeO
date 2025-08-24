@@ -9,8 +9,9 @@
   flex: 1; /* 1 часть из 3 */
   max-width: 33%;
   display: flex;
+  flex-direction: column; /* чтобы кнопка была под картинкой */
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 5px;
 }
 
@@ -23,6 +24,21 @@
   border-radius: 8px;
   box-shadow: 0 0 0px rgba(0,0,0,0.5);
 }
+
+.change-token-btn {
+  margin-top: 8px;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #999;
+  background: #eee;
+  cursor: pointer;
+}
+
+.change-token-btn:hover {
+  background: #ddd;
+}
+
 
 /* Правая колонка: инфо */
 .info-col {
@@ -195,17 +211,40 @@
   flex-direction: column;
   font-weight: bold;
   margin-bottom: 10px;
-  height: 200px;           /* задаём минимальную высоту секции */
+  height: 100%;             /* растягивается на всё доступное окно */
+  flex: 1 1 auto;           /* занимает свободное место */
+  min-height: 200px;        /* нижний порог */
 }
 
-.additional-info-section textarea {
+/* контейнер вкладок */
+.additional-info-section .sheet-tabs {
+  flex: 0 0 auto;           /* фиксированная высота (только сами кнопки) */
+  margin-bottom: 6px;
+}
+
+/* вкладка по умолчанию скрыта */
+.additional-info-section .tab {
+  display: none;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+/* активная вкладка */
+.additional-info-section .tab.active {
+  display: flex;
+}
+
+/* сам редактор */
+.additional-info-section prose-mirror {
+  flex: 1 1 auto;
   width: 100%;
-  height: 100%;            /* растягивается по всей высоте секции */
   box-sizing: border-box;
   border-radius: 8px;
   border: 1px solid #bbb;
+  background: #ffffff51;
   padding: 5px;
-  resize: vertical;        /* пользователь может менять высоту вручную */
+  resize: none;             /* если хочешь запретить ручное растягивание */
+  overflow: auto;           /* скролл если текста больше чем высота */
 }
 
 .action-button-row {
@@ -264,4 +303,85 @@
 
 .character-action .action-buttons button:hover {
   background-color: #444;
+}
+
+/* --- NPC Лист --- */
+.npc-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 10px;          /* 🔹 отступ вокруг верхнего блока */
+  padding: 10px;
+  background: #ffffff69; /* лёгкая подложка, можно убрать */
+  border-radius: 8px;
+  flex: 0 0 auto;        /* высота = содержимое */
+}
+
+/* Портрет */
+.npc-portrait {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 120px;
+  flex: 0 0 auto;
+}
+.npc-portrait img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.npc-portrait .change-token-btn {
+  margin-top: 5px;
+  font-size: 0.8em;
+  padding: 2px 6px;
+}
+
+/* Имя и ресурс */
+.npc-main-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.npc-main-info input.no-border {
+  font-size: 1.5em;
+  font-weight: bold;
+  border: none;
+  border-bottom: 1px solid #aaa;
+  margin-bottom: 5px;
+  width: 100%;
+}
+.npc-hp-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.npc-hp-row label {
+  flex: 1 1 auto;
+}
+.npc-hp-row input.hp-input {
+  width: 50px;
+  text-align: center;
+  flex: 0 0 auto;
+}
+
+/* Заметки */
+.npc-notes {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  min-height: 0;
+}
+.npc-notes label {
+  margin-bottom: 5px;     /* 🔹 просто подпись */
+  flex: 0 0 auto;         /* не влияет на высоту */
+}
+.npc-notes prose-mirror.editor {
+  flex: 1 1 auto;         /* 🔹 занимает всё оставшееся */
+  min-height: 0;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  padding: 5px;
+  background: #ffffff;
+  overflow: auto;
 }
