@@ -1,121 +1,125 @@
 export class ThreeO {
     static async init() {}
   
-static async roll(diceCount, modifier = 'normal') {
+static async roll(diceCount, modifier = 'normal', actorId = null) {
   const modulename = "oxy949-threeO";
   const zeroMode = game.settings.get(modulename, "zeroMode");
 
-  const character = game.user.character;
-
-  if (!character) {
+  // Находим актёра — если передали actorId, используем его, иначе привязанный к пользователю персонаж
+  const actor = actorId ? game.actors.get(actorId) : game.user.character;
+  if (!actor) {
     ui.notifications.error("У вас нет привязанного персонажа!");
     return;
   }
 
-  const currentHP = character.system.attributes.hp.value;
+  // Текущее HP (рассудок)
+  const currentHP = actor.system.attributes?.hp?.value ?? 0;
+
+  // 🔹 Сохраняем snapshot HP и параметры броска в флаг актёра для возможного реролла
+  await actor.setFlag(modulename, "lastRoll", {
+    value: diceCount,
+    type: modifier,
+    actorId: actor.id,
+    prevHP: currentHP,
+    timestamp: Date.now()
+  });
 
   // Проверяем только если zeroMode выключен
   if (!zeroMode && currentHP <= 0) {
     ui.notifications.error("У вас нет ресурса!");
     return;
   }
-      
-      const easyMode = game.settings.get(modulename, "easyModeLyghtburg");
-  
-      let successes = 0;
-      let empty = 0;
-      let failures = 0;
-  
-      // Генерация броска
-      //const roll = await new Roll(`${diceCount}df`).evaluate({ async: true });
-      
-      const roll = await new Roll(`${diceCount}df`).evaluate(); 
-  
-      roll.terms[0].results.forEach(r => {
-        if (r.result === -1) failures += 1;
-        if (r.result === 0) empty += 1;
-        if (r.result === 1) successes += 1;
-      });
-      // Формирование текста сообщения
-      let rollMessage = "<p>";
-      let rollDiceText = "Действует как обычно, ";
-  
-      if (diceCount === 1) {
-        rollDiceText = "Действует осторожно, ";
-      } else if (diceCount === 3) {
-        rollDiceText = "Действует опасно, ";
-      }
-  
-      let rollTypeText = "самостоятельно";
-  
-      if (modifier === 'hard') {
-        rollTypeText = "но что-то мешает";
-      } else if (modifier === 'easy') {
-        rollTypeText = "но что-то помогает";
-      }
-  
-      rollMessage += `<strong style="font-size: large;">${rollDiceText} ${rollTypeText}</strong><br>`;
-      rollMessage += "</p>";
-  
-      let resourceRemoved = 0;
-      let totalResult = 0;
-  
-      if (easyMode) {
-        if (modifier === 'normal') {
-          resourceRemoved = failures + empty - successes;
-          totalResult = successes - failures;
-        } else if (modifier === 'hard') {
-          resourceRemoved = failures + empty - successes;
-          totalResult = successes - failures - empty;
-        } else if (modifier === 'easy') {
-          resourceRemoved = failures - successes;
-          totalResult = successes - failures + empty;
-        }
-      } else {
-        if (modifier === 'normal') {
-          resourceRemoved = failures + empty;
-          totalResult = successes - failures;
-        } else if (modifier === 'hard') {
-          resourceRemoved = failures + empty;
-          totalResult = successes - failures - empty;
-        } else if (modifier === 'easy') {
-          resourceRemoved = failures;
-          totalResult = successes - failures + empty;
-        }
-      }
-  
-      const resourceShow = game.settings.get(modulename, "resourceShow");
-      const resourceName = game.settings.get(modulename, "resourceName");
-        
-      let statsMessage = "";
-      if (resourceRemoved > 0 && currentHP !=0) {
-        statsMessage += `<strong style="color: red;">Потеря ${resourceName}: ${resourceRemoved}<br></strong>`;
-      } else if (resourceRemoved < 0) {
-        statsMessage += `<strong style="color: green;">Восстановление ${resourceName}: ${Math.abs(resourceRemoved)}<br></strong>`;
-      } else {
-        statsMessage += `<strong style="color: grey;">Состояние не изменилось<br></strong>`;
-      }
-  
-      statsMessage += `<strong style="font-size: medium;">Успешность: ${totalResult}</strong>`;
-  
-        // Проверяем только если zeroMode выключен
-  if (!zeroMode && currentHP <= resourceRemoved) {
-        statsMessage += `<br><strong style="font-size: large;">Недостаточно ресурса, потеря сознания!</strong>`;
-      }
-  
-      const flavor = `${rollMessage}${statsMessage}`;
-      const speaker = ChatMessage.getSpeaker({ actor: character });
-  
-      // Сообщение в чат и автоматическая анимация кубиков
-      await roll.toMessage({ rollMode: 'publicroll', flavor, speaker });
-  
-      // После завершения анимации наносим урон с задержкой
-      Hooks.once("diceSoNiceRollComplete", () => {
-        setTimeout(() => {
-          character.applyDamage(resourceRemoved);
-        }, 500);
-      });
+
+  const easyMode = game.settings.get(modulename, "easyModeLyghtburg");
+
+  let successes = 0;
+  let empty = 0;
+  let failures = 0;
+
+  // Генерация броска
+  const roll = await new Roll(`${diceCount}df`).evaluate();
+
+  roll.terms[0].results.forEach(r => {
+    if (r.result === -1) failures += 1;
+    if (r.result === 0) empty += 1;
+    if (r.result === 1) successes += 1;
+  });
+
+  // Формирование текста сообщения
+  let rollMessage = "<p>";
+  let rollDiceText = "Действует как обычно, ";
+
+  if (diceCount === 1) {
+    rollDiceText = "Действует осторожно, ";
+  } else if (diceCount === 3) {
+    rollDiceText = "Действует опасно, ";
+  }
+
+  let rollTypeText = "самостоятельно";
+  if (modifier === 'hard') rollTypeText = "но что-то мешает";
+  else if (modifier === 'easy') rollTypeText = "но что-то помогает";
+
+  rollMessage += `<strong style="font-size: large;">${rollDiceText} ${rollTypeText}</strong><br>`;
+  rollMessage += "</p>";
+
+  let resourceRemoved = 0;
+  let totalResult = 0;
+
+  if (easyMode) {
+    if (modifier === 'normal') {
+      resourceRemoved = failures + empty - successes;
+      totalResult = successes - failures;
+    } else if (modifier === 'hard') {
+      resourceRemoved = failures + empty - successes;
+      totalResult = successes - failures - empty;
+    } else if (modifier === 'easy') {
+      resourceRemoved = failures - successes;
+      totalResult = successes - failures + empty;
     }
+  } else {
+    if (modifier === 'normal') {
+      resourceRemoved = failures + empty;
+      totalResult = successes - failures;
+    } else if (modifier === 'hard') {
+      resourceRemoved = failures + empty;
+      totalResult = successes - failures - empty;
+    } else if (modifier === 'easy') {
+      resourceRemoved = failures;
+      totalResult = successes - failures + empty;
+    }
+  }
+
+  const resourceName = game.settings.get(modulename, "resourceName");
+
+  let statsMessage = "";
+  if (resourceRemoved > 0 && currentHP != 0) {
+    statsMessage += `<strong style="color: red;">Потеря ${resourceName}: ${resourceRemoved}<br></strong>`;
+  } else if (resourceRemoved < 0) {
+    statsMessage += `<strong style="color: green;">Восстановление ${resourceName}: ${Math.abs(resourceRemoved)}<br></strong>`;
+  } else {
+    statsMessage += `<strong style="color: grey;">Состояние не изменилось<br></strong>`;
+  }
+
+  statsMessage += `<strong style="font-size: medium;">Успешность: ${totalResult}</strong>`;
+
+  if (!zeroMode && currentHP <= resourceRemoved) {
+    statsMessage += `<br><strong style="font-size: large;">Недостаточно ресурса, потеря сознания!</strong>`;
+  }
+
+  const flavor = `${rollMessage}${statsMessage}`;
+  const speaker = ChatMessage.getSpeaker({ actor: actor });
+
+  // Сообщение в чат и анимация кубиков
+  await roll.toMessage({ rollMode: 'publicroll', flavor, speaker });
+
+  // После завершения анимации — применяем урон/лечение (applyDamage корректно работает в вашей системе)
+  Hooks.once("diceSoNiceRollComplete", () => {
+    setTimeout(() => {
+      actor.applyDamage(resourceRemoved);
+    }, 500);
+  });
+}
+
   
     static async useCharm(diceCount) {
     const character = game.user.character;
@@ -241,15 +245,17 @@ static async roll(diceCount, modifier = 'normal') {
     }
   }
   
+  
   //Активируем кастомный чарник персонажа игрока
 class ThreeOActorSheet extends ActorSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["threeO", "sheet", "actor"],
       template: "modules/oxy949-threeO/templates/actor-sheet.html",
-      width: 980,
-      height: 550,
-      submitOnChange: true   // теперь изменения сохраняются при blur
+      width: 1060,
+      height: 610,
+      submitOnChange: true   // теперь изменения сохраняются при blur    
+        
     });
   }
 
@@ -259,15 +265,46 @@ class ThreeOActorSheet extends ActorSheet {
 
     const modulename = "oxy949-threeO";
     context.resourceName = game.settings.get(modulename, "resourceName");
+    context.inspName = game.settings.get(modulename, "inspName");    
+    context.inspSound = game.settings.get(modulename, "inspSound");        
     context.actionList = game.settings.get(modulename, "actionList");
     context.resourceShow = game.settings.get(modulename, "resourceShow");
     context.itemsName = game.settings.get(modulename, "itemsName"); 
+    context.charInfoName = game.settings.get(modulename, "charInfoName");     
     context.additionalInfo1 = this.actor.getFlag(modulename, "additionalInfo1") ?? "";
+    context.additionalInfoCharacter =  this.actor.getFlag(modulename, "additionalInfoCharacter") ?? "";    
     context.additionalInfo2 = this.actor.getFlag(modulename, "additionalInfo2") ?? "";
     context.additionalInfo3 = this.actor.getFlag(modulename, "additionalInfo3") ?? "";  
     context.gmNotes = this.actor.getFlag("oxy949-threeO", "gmNotes") ?? "";             
     context.isGM = game.user.isGM;
+    context.inspiration = this.actor.getFlag("oxy949-threeO", "inspiration") ?? 0;
+    context.inspirationChecks = [1, 2, 3, 4, 5];
 
+Hooks.once("ready", function() {
+  // Если объекта ещё нет
+  if (!game.threeO) game.threeO = {};
+
+  // Функция броска
+  game.threeO.roll = async function(actionValue, actionType, actorId=null) {
+    // сам бросок
+    const roll = await new Roll("1d20").roll({async:true});
+    roll.toMessage({flavor: `Бросок (${actionType}), сложность ${actionValue}`});
+
+    // Находим актёра
+    let actor = actorId ? game.actors.get(actorId) : game.user.character;
+    if (!actor) return;
+
+    // Пример изменения ресурса (hp = "рассудок")
+    let hp = foundry.utils.duplicate(actor.system.attributes.hp);
+    hp.value = Math.max(0, Math.min(hp.max, hp.value - actionValue));
+    await actor.update({"system.attributes.hp": hp});
+  
+    const currentHP = character.system.attributes.hp.value;
+    // Сохраняем предыдущее значение HP для возможного отката "Овацией"
+    game.threeO = game.threeO || {};
+    game.threeO.lastHP = currentHP;    
+  };
+});
     // cover.jpg
     const coverPath = `worlds/${game.world.id}/cover.jpg`;
     try { await fetch(coverPath, { method: "HEAD" }); context.cover = coverPath; }
@@ -290,52 +327,108 @@ class ThreeOActorSheet extends ActorSheet {
   }
 
   activateListeners(html) {
-    super.activateListeners(html);
-    const modulename = "oxy949-threeO";
+  super.activateListeners(html);
+  const modulename = "oxy949-threeO";
 
   // ------------------------
   // Кнопка смены токена в чарнике
   // ------------------------
   html.find(".change-token-btn").on("click", async ev => {
-  ev.preventDefault();
+    ev.preventDefault();
 
-  // Открыть диалог выбора файла
-  const fp = new FilePicker({
-    type: "image",
-    current: this.actor.prototypeToken.texture.src,
-    callback: async (path) => {
-      await this.actor.update({ "prototypeToken.texture.src": path });
-      ui.notifications.info("Токен изменён.");
-    },
-    top: this.position.top + 40,
-    left: this.position.left + 10
+    const fp = new FilePicker({
+      type: "image",
+      current: this.actor.prototypeToken.texture.src,
+      callback: async (path) => {
+        await this.actor.update({ "prototypeToken.texture.src": path });
+        ui.notifications.info("Токен изменён.");
+      },
+      top: this.position.top + 40,
+      left: this.position.left + 10
+    });
+    fp.render(true);
   });
-  fp.render(true);
-});    
 
   // ------------------------
-  // Обработчики действий
+  // Обработчик кнопок действий (бросок)
   // ------------------------
-  // Используем делегирование, чтобы работало даже если контент перерисуется
   html.on("click", ".action-option", async ev => {
     ev.preventDefault();
 
     const button = ev.currentTarget;
-    const actionValue = Number(button.dataset.value); // 1, 2, 3
-    const actionType = html.find("#actionType").val(); // выбранный тип действия
+    const actionValue = Number(button.dataset.value); // 1,2,3
+    const actionType = html.find("#actionType").val();
 
-    if (!game.threeO?.roll) {
+    if (!ThreeO?.roll) {
       ui.notifications.error("Система действий не инициализирована.");
       return;
     }
 
-    game.threeO.roll(actionValue, actionType);
+    // Сохранять lastRoll флаг не обязательно здесь — ThreeO.roll делает это — но можно дополнительно:
+    // await this.actor.setFlag(modulename, "lastRoll", { value: actionValue, type: actionType, actorId: this.actor.id, prevHP: this.actor.system.attributes.hp.value });
+
+    // Вызов броска для данного актёра (ThreeO.roll сохранит prevHP)
+    await ThreeO.roll(actionValue, actionType, this.actor.id);
+  });
+
+  // ------------------------
+  // Игроки могут кликать галочки "Овации"
+  // ------------------------
+// Звук овации
+const sound = game.settings.get("oxy949-threeO", "inspSound");
+const volume = game.settings.get("oxy949-threeO", "inspVolume");
+  // используем делегированное 'change' событие
+  html.on("change", ".insp-check", async ev => {
+    const idx = Number(ev.currentTarget.dataset.index);
+    const isChecked = ev.currentTarget.checked;
+
+    let current = this.actor.getFlag(modulename, "inspiration") ?? 0;
+
+    // только когда игрок СНИМАЕТ (т.е. перевёл чек в false) последнюю галочку
+    if (!isChecked && idx === current) {
+ // звук при использовании
+if (sound) {
+  AudioHelper.play({ src: sound, volume, autoplay: true, loop: false }, true);
+} 
+      // уменьшаем счётчик оваций у актёра (флаг)
+      await this.actor.setFlag(modulename, "inspiration", current - 1);
+
+      // получаем lastRoll из флага актёра
+      const lastRoll = this.actor.getFlag(modulename, "lastRoll");
+      if (!lastRoll) {
+        ui.notifications.warn("Нет предыдущего броска для повторения.");
+        return;
+      }
+
+      // проверьте, что lastRoll принадлежит этому актёру (защита)
+      if (lastRoll.actorId && lastRoll.actorId !== this.actor.id) {
+        ui.notifications.warn("Последний бросок не принадлежит этому персонажу.");
+        return;
+      }
+
+      // откатываем HP к сохранённому prevHP (await — важно)
+      if (lastRoll.prevHP !== undefined) {
+        await this.actor.update({ "system.attributes.hp.value": lastRoll.prevHP });
+        // (не обязателен) можно обновить UI: await this.render(false);
+      }
+
+      // пишем в чат что используется овация
+      ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+        content: `<p>🎭 <strong style="font-size: medium; color: #005e37ff;">${this.actor.name}</strong> использует силу 👏${game.settings.get(modulename, "inspName")}👏 чтобы <strong style="font-size: medium; color: #005e37ff;">уйти от судьбы!</strong></p>`
+      });
+
+      // Наконец — повторный бросок (он снова сохранит новый lastRoll)
+      await ThreeO.roll(lastRoll.value, lastRoll.type, this.actor.id);
+    } else {
+      // если игрок пытается поставить галочку или трогает не последнюю — просто перерисовать лист (чтобы синхронизировать вид)
+      this.render();
+    }
   });
 
   // ------------------------
   // Вкладки (Notes)
   // ------------------------
-  // Убедимся, что Tabs берётся из актуального API Foundry
   const TabsCls = foundry?.applications?.api?.Tabs ?? window.Tabs;
 
   this._tabs = this._tabs || {};
@@ -346,8 +439,9 @@ class ThreeOActorSheet extends ActorSheet {
   });
   this._tabs.notes.bind(html[0]);
 
-
-    // === Добавить ===
+  // ------------------------
+  // Инвентарь: добавить / удалить / drag&drop
+  // ------------------------
   html.on("click", ".inventory-add", async (ev) => {
     ev.preventDefault();
     const inv = [];
@@ -359,7 +453,6 @@ class ThreeOActorSheet extends ActorSheet {
     this.render();
   });
 
-  // === Удалить ===
   html.on("click", ".inventory-remove", async (ev) => {
     ev.preventDefault();
     const idx = Number(ev.currentTarget.dataset.index);
@@ -372,38 +465,37 @@ class ThreeOActorSheet extends ActorSheet {
     this.render();
   });
 
-  // === Drag&Drop ===
   let dragSrcIndex = null;
-
-html.find(".drag-handle").on("dragstart", (ev) => {
-  const row = ev.currentTarget.closest(".inventory-row");
-  dragSrcIndex = Number(row.dataset.index);
-  ev.originalEvent.dataTransfer.effectAllowed = "move";
-});
-
-html.find(".inventory-row").on("dragover", (ev) => {
-  ev.preventDefault();
-  ev.originalEvent.dataTransfer.dropEffect = "move";
-});
-
-html.find(".inventory-row").on("drop", async (ev) => {
-  ev.preventDefault();
-  const dropIndex = Number(ev.currentTarget.dataset.index);
-  if (dragSrcIndex === null || dropIndex === dragSrcIndex) return;
-
-  const inv = [];
-  html.find("input[name^='flags." + modulename + ".inventory.']").each((i, el) => {
-    inv.push(el.value);
+  html.find(".drag-handle").on("dragstart", (ev) => {
+    const row = ev.currentTarget.closest(".inventory-row");
+    dragSrcIndex = Number(row.dataset.index);
+    ev.originalEvent.dataTransfer.effectAllowed = "move";
   });
 
-  const [moved] = inv.splice(dragSrcIndex, 1);
-  inv.splice(dropIndex, 0, moved);
+  html.find(".inventory-row").on("dragover", (ev) => {
+    ev.preventDefault();
+    ev.originalEvent.dataTransfer.dropEffect = "move";
+  });
 
-  await this.actor.setFlag(modulename, "inventory", inv);
-  this.render(false);
-  dragSrcIndex = null;
-});
+  html.find(".inventory-row").on("drop", async (ev) => {
+    ev.preventDefault();
+    const dropIndex = Number(ev.currentTarget.dataset.index);
+    if (dragSrcIndex === null || dropIndex === dragSrcIndex) return;
+
+    const inv = [];
+    html.find("input[name^='flags." + modulename + ".inventory.']").each((i, el) => {
+      inv.push(el.value);
+    });
+
+    const [moved] = inv.splice(dragSrcIndex, 1);
+    inv.splice(dropIndex, 0, moved);
+
+    await this.actor.setFlag(modulename, "inventory", inv);
+    this.render(false);
+    dragSrcIndex = null;
+  });
 }
+
 
   /** Сохраняем инвентарь, доп. информацию и все system.* поля */
   async _updateObject(event, formData) {
@@ -421,18 +513,45 @@ html.find(".inventory-row").on("drop", async (ev) => {
     if (formData[addKey] !== undefined) {
       await this.actor.setFlag(modulename, "additionalInfo", formData[addKey]);
     }
+   // --- сохраняем черты характера ---
+const charKey = `flags.${modulename}.additionalInfoCharacter`;
+if (formData[charKey] !== undefined) {
+  await this.actor.setFlag(modulename, "additionalInfoCharacter", formData[charKey]);
+}    
 
-    // --- сохраняем всё остальное (имя, HP, system.* и т.п.) ---
-    const updateDataFlat = {};
-    for (const [k, v] of Object.entries(formData)) {
-      if (k.startsWith(`flags.${modulename}.inventory.`)) continue;
-      if (k === addKey) continue;
-      updateDataFlat[k] = v;
+  // --- сохраняем всё остальное (имя, HP, system.* и т.п.) ---
+const updateDataFlat = {};
+for (const [k, v] of Object.entries(formData)) {
+  if (k.startsWith(`flags.${modulename}.inventory.`)) continue;
+  if (k === addKey) continue;
+  updateDataFlat[k] = v;
+}
+if (Object.keys(updateDataFlat).length) {
+  const updateData = foundry.utils.expandObject(updateDataFlat);
+
+  // Проверяем изменение оваций
+  const newInsp = getProperty(updateData, "flags.oxy949-threeO.inspiration");
+  if (newInsp !== undefined) {
+    const oldInsp = this.actor.getFlag("oxy949-threeO", "inspiration") ?? 0;
+    if (newInsp > oldInsp) {
+      // звук для ГМа
+      const gmSound = game.settings.get("oxy949-threeO", "gmInspSound");
+      const gmVolume = game.settings.get("oxy949-threeO", "gmInspVolume");
+      if (gmSound) {
+        AudioHelper.play({ src: gmSound, volume: gmVolume, autoplay: true, loop: false }, true);
+      }
+
+      // сообщение в чат
+      ChatMessage.create({
+        speaker: { alias: "👏👏👏" },
+        content: `🎭 <strong style="font-size: medium; color: #7b0c50ff;">${this.actor.name}</strong> - в честь тебя звучат бурные овации! <strong style="font-size: medium; color: #7b0c50ff;">Прекрасная игра!</strong>`
+      });
     }
-    if (Object.keys(updateDataFlat).length) {
-      const updateData = foundry.utils.expandObject(updateDataFlat);
-      await this.actor.update(updateData);
-    }
+  }
+
+  await this.actor.update(updateData);
+}
+
   }
 }
 

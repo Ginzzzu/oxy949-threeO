@@ -44,13 +44,42 @@
 <!-- Выбор действия -->
 {{#if actionList}} 
 <div class="character-action">
-  <label for="actionType">Тип действия:</label>
-  <select id="actionType" style="width: 100%;">
-    <option value="normal">Действую самостоятельно</option>
-    <option value="easy">Есть преимущество: кто-то или что-то помогает</option>
-    <option value="hard">Есть помеха: кто-то или что-то мешает</option>
-  </select>
+  <div class="action-top-row">
+    <!-- Тип действия -->
+    <div class="action-type-row">
+       <!--<label for="actionType">Тип действия:</label>-->
+      <select id="actionType">
+        <option value="normal">Действую самостоятельно</option>
+        <option value="easy">Есть преимущество: кто-то или что-то помогает</option>
+        <option value="hard">Есть помеха: кто-то или что-то мешает</option>
+      </select>
+    </div>
 
+    <!-- Вдохновение -->
+<div class="inspiration-row">
+  <label><strong>{{inspName}}:</strong></label>
+  {{#if isGM}}
+    <input type="number" name="flags.oxy949-threeO.inspiration" value="{{inspiration}}" class="insp-input"/>
+  {{/if}} 
+
+  <div class="insp-checks">
+    {{#each inspirationChecks as |i|}}
+      <label class="insp-check-label" title="🎭 Использовать овацию: переброс последнего действия">
+        <input type="checkbox"
+               name="insp-check-{{i}}"
+               class="insp-check"
+               data-index="{{i}}"
+               {{#if (gte ../inspiration i)}}checked{{/if}} />
+        <span class="insp-icon"></span>
+      </label>
+    {{/each}}
+  </div>
+</div>
+
+
+  </div>
+
+  <!-- Кнопки действий -->
   <div class="action-buttons">
     <button type="button" class="action-option" data-value="1">Осторожно</button>
     <button type="button" class="action-option" data-value="2">Обычно</button>
@@ -62,17 +91,26 @@
       <!-- Информация -->
 <div class="additional-info-section">
   <nav class="sheet-tabs tabs" data-group="notes">
-    <a class="item" data-tab="note1">Главное</a>
-    <a class="item" data-tab="note2">Второстепенное</a>
-    <a class="item" data-tab="note3">Остальное</a>
+    <a class="item" data-tab="note1">Заметки и Характер</a>
+    <a class="item" data-tab="note2">Инвентарь</a>
+    <a class="item" data-tab="note3">Разное</a>
   </nav>
 
-  <section class="tab" data-group="notes" data-tab="note1">
-    <prose-mirror name="flags.oxy949-threeO.additionalInfo1"
-                  class="editor"
-                  value="{{additionalInfo1}}">
-    </prose-mirror>
-  </section>
+<section class="tab" data-group="notes" data-tab="note1">
+  <div class="info-split">
+    <div class="info-column main-info">
+      <prose-mirror name="flags.oxy949-threeO.additionalInfo1"
+                    class="editor"
+                    value="{{additionalInfo1}}">
+      </prose-mirror>
+    </div>
+    <div class="info-column character-info">
+      <label class="info-title">{{charInfoName}}:</label>
+      <textarea name="flags.oxy949-threeO.additionalInfoCharacter"
+                class="char-textarea">{{additionalInfoCharacter}}</textarea>
+    </div>
+  </div>
+</section>
 
   <section class="tab" data-group="notes" data-tab="note2">
     <prose-mirror name="flags.oxy949-threeO.additionalInfo2"
@@ -89,18 +127,32 @@
   </section>
 </div>
 
-      <!-- Инвентарь -->
+      <!-- Фобии -->
+
 <div class="inventory-section">
   <div class="inventory-title">{{itemsName}}</div>
-{{#each inventory as |item i|}}
-  <div class="inventory-row" data-index="{{i}}">
-    <span class="drag-handle" draggable="true">☰</span>
-    <input type="text" name="flags.oxy949-threeO.inventory.{{i}}" value="{{item}}" />
-    <button type="button" class="inventory-remove" data-index="{{i}}">×</button>
-  </div>
-{{/each}}
-  <button type="button" class="inventory-add">Добавить</button>
+  {{#each inventory as |item i|}}
+    <div class="inventory-row" data-index="{{i}}">
+      {{#if ../isGM}}
+        <span class="drag-handle" draggable="true">☰</span>
+        <input type="text"
+               class="inventory-input"
+               name="flags.oxy949-threeO.inventory.{{i}}"
+               value="{{item}}" />
+        <button type="button"
+                class="inventory-remove"
+                data-index="{{i}}">×</button>
+      {{else}}
+<input type="text" class="inventory-input" name="flags.oxy949-threeO.inventory.{{i}}" value="{{item}}" />
+      {{/if}}
+    </div>
+  {{/each}}
+  {{#if isGM}}
+    <button type="button" class="inventory-add">Добавить</button>
+  {{/if}}
 </div>
+
+
 
     </div>
   </div>

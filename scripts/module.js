@@ -43,7 +43,7 @@ Hooks.once("ready", async () => {
   if (!game.user.isGM) return; // только для ГМа
 
   // Проверяем, есть ли уже макрос с таким именем
-  let macroName = "Действовать!";
+  let macroName = "Нужные макросы";
   let macro = game.macros.find(m => m.name === macroName);
 
   if (!macro) {
@@ -52,50 +52,46 @@ Hooks.once("ready", async () => {
       name: macroName,
       type: "script",
       scope: "global",
-      img: "icons/magic/control/silhouette-hold-change-green.webp",
+      img: "icons/commodities/tech/cog-brass.webp",
       command: `
-const character1 = game.user.character;
+//ВИДИМОСТЬ ТАЙЛОВ
+const updates = [];
+let tile = canvas.tiles.get("TILE-ID");
+if (tile.document.hidden==false){
+    updates.push({
+       _id:tile.id,
+       hidden:true
+    });
+} else {
+    updates.push({
+       _id:tile.id,
+       hidden:false
+    });
+}
+canvas.scene.updateEmbeddedDocuments("Tile", updates);
 
-new Dialog({
-  title: "ВРЕМЯ ДЕЙСТВОВАТЬ!",
-  content: \`
-<p>
-  <select id="actionType" style="width: 100%;">
-    <option value="normal">Действую самостоятельно</option>
-    <option value="easy">Есть преимущество: кто-то или что-то помогает</option>
-    <option value="hard">Есть помеха: кто-то или что-то мешает</option>
-  </select>
-</p>
-\`,
-  buttons: {
-    option1: {
-      label: "Осторожно",
-      callback: (html) => {
-        const actionType = html.find("#actionType").val();
-        game.threeO.roll(1, actionType );
-      }
-    },
-    option2: {
-      label: "Обычно",
-      callback: (html) => {
-        const actionType = html.find("#actionType").val();
-        game.threeO.roll(2, actionType );
-      }
-    },
-    option3: {
-      label: "Опасно",
-      callback: (html) => {
-        const actionType = html.find("#actionType").val();
-        game.threeO.roll(3, actionType );
-      }
-    }
-  },
-  default: "option2"
-}).render(true);
+// ЗАПУСК МУЗЫКИ ИЗ ПЛЕЙЛИСТА
+const playlistName = "ПЛЕЙЛИСТ";          // Имя плейлиста
+const trackName = "ТРЕК";       // Имя трека
+const fadeDuration = 3000;                 // Время затухания/нарастания в мс
+const maxVolume = 1.0;                     // Максимальная громкость (0..1)
+// --- КОНЕЦ НАСТРОЕК ---
+const playlist = game.playlists.getName(playlistName);
+const sound = playlist.sounds.getName(trackName);
+if(sound.playing){ await playlist.stopSound(sound);
+                 }else{ await playlist.playSound(sound);}
+
+// ЗАПУСК ЗВУКА ОТДЕЛЬНО
+new Sequence()
+    .sound("ПУТЬ К ФАЙЛУ.mp3")
+    .audioChannel("environment")  
+    .forUsers("ЛОГИН_ИГРОКА")     
+    .forUsers("ЛОГИН_МАСТЕРА")    
+    .play()
 `
     });
 
-    ui.notifications.info("Макрос 'Действовать!' создан и добавлен в панель макросов.");
+    ui.notifications.info("Нужные макросы созданы и добавлены в панель макросов.");
   }
 
   // Кладем макрос в слот 1 хотбара ГМа
@@ -104,24 +100,3 @@ new Dialog({
     await game.user.assignHotbarMacro(macro, 1);
   }
 });
-/*
-Hooks.on("renderChatMessage", function (message, html, data) {
-  // Check if the message is a roll
-  if (message.isRoll && game.user.isGM) {
-    if (!message.getFlag('oxy949-threeO', `clicked-${message.id}`)) {
-        html.find(`button#reduce-dice`).click(async () => {
-            
-            const failuresValue = html.find(`button#reduce-dice`).data('failures');
-            game.candles.removePlayerDice(failuresValue)
-
-            html.find(`button#reduce-dice`).hide();  // Скрываем кнопку
-            await message.setFlag('oxy949-threeO', `clicked-${message.id}`, true);  // Уникальный флаг для конкретного сообщения
-        });
-    }else{
-      html.find(`button#reduce-dice`).hide();  // Скрываем кнопку
-    }
-  }else{
-    html.find(`button#reduce-dice`).hide();  // Скрываем кнопку
-  }
-});
-  */

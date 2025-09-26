@@ -1,7 +1,26 @@
+/* --- Чарник без стандартного заголовка --- */
+.app.window-app.threeO {
+  background: rgba(29, 27, 37, 0.95) !important;
+  border: 2px solid #444 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Контент без лишних отступов */
+.app.window-app.threeO .window-content {
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
 /* Основная сетка */
 .sheet-content {
   display: flex;
   height: 100%;
+
 }
 
 /* Левая колонка: портрет */
@@ -11,7 +30,7 @@
   display: flex;
   flex-direction: column; /* чтобы кнопка была под картинкой */
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   padding: 5px;
 }
 
@@ -31,7 +50,7 @@
   font-size: 0.9rem;
   border-radius: 6px;
   border: 1px solid #999;
-  background: #eee;
+  background: #80a9a0;
   cursor: pointer;
 }
 
@@ -43,11 +62,12 @@
 /* Правая колонка: инфо */
 .info-col {
   flex: 2; /* занимает 2/3 ширины */
-  padding: 15px;
+  padding: 10px;
   margin: 10px; /* отступ со всех сторон */
   
-  background: rgba(168, 168, 168, 0.9); /* чуть плотнее фон */
+  background: rgba(29, 27, 37, 0.95); /* чуть плотнее фон */
   border-radius: 12px; /* более мягкие скругления */
+  color: #d7d7d7;
   
   overflow-y: auto;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* лёгкая тень */
@@ -75,6 +95,7 @@
 /* Имя персонажа */
 .name-hp-row .char-name {
   flex: 1;         /* занимает всё доступное место */
+
   margin-right: 15px;
 }
 
@@ -87,6 +108,7 @@
   font-size: 26px;       /* читаемый размер */
   font-weight: bold;       /* читаемый размер */
   height: auto;          /* чтобы браузер сам подстроил */
+  color: #888;  
 }
 
 /* Поле HP */
@@ -104,19 +126,281 @@
   border-radius: 8px;
   padding: 2px 4px;
   text-align: center;
+  color: #dddddd;
 }
 
-/* Инвентарь */
+/* ПАНЕЛЬ ДЕЙСТВИЙ */
+.character-action {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  flex: 0 0 auto; /* чтобы секция не тянулась по высоте */    
+}
+
+.character-action label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 4px;  
+}
+
+.character-action .action-buttons {
+  display: flex;
+  gap: 6px; /* расстояние между кнопками */
+}
+
+.character-action .action-buttons button {
+  flex: 1; /* каждая кнопка растягивается равномерно */
+  padding: 2px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 0px solid #888;
+  border-radius: 10px;
+  background-color:#2f1f42;
+  color: #c5c5c5;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.character-action .action-buttons button:hover {
+  background-color: #983e10;
+}
+
+.action-top-row {
+  display: flex;
+  flex-wrap: wrap;       /* 🔹 позволяет переносить блоки */  
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.action-type-row {
+  flex: 1 1 250px;       /* 🔹 занимает место, но может переноситься */
+  display: flex;
+  flex-wrap: wrap;             /* 🔹 разрешаем перенос */  
+  justify-content: space-between;  
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.action-type-row select {
+  flex: 1 1 auto;
+  width: auto;      /* растягивается вправо */
+  font-size: 17px;
+  /*text-align: center; */ 
+  /*background-color:#281821;  */
+  color: #b9b9b9;
+  border: 0px solid #888;  
+  background-color:#2f1f42; 
+}
+
+.threeO select option {
+  background-color: #2f1f42;
+  color: #d7d7d7;
+}
+
+.threeO select option:hover {
+  background-color: #983e10;   /* 🔥 цвет при наведении */
+  color: #fff;
+}
+
+.inspiration-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;     /* 🔹 содержимое по центру */
+  flex: 0 1 auto;              /* 🔹 занимает всю строку при переносе */
+  min-width: 180px;      /* 🔹 чтобы не ломался при сжатии */
+}
+
+.insp-checks {
+  display: flex;
+  gap: 2px;
+}
+
+.insp-checks input[type="checkbox"] {
+  transform: scale(1.1);
+  cursor: default; 
+}
+
+.insp-input {
+  width: 40px;
+  text-align: center;
+  font-weight: bold;
+  color: #ffffff; 
+  background-color: #bf5813;  
+}
+
+/* Контейнер */
+.insp-check-label {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 4px;
+  position: relative;
+}
+
+/* Прячем стандартный чекбокс */
+.insp-check-label input[type="checkbox"] {
+  display: none;
+}
+
+/* Базовое состояние (неиспользованная овация) */
+.insp-check-label .insp-icon::before {
+  content: "👏";
+  font-size: 22px;
+  opacity: 0.3;
+  color: grey;
+  transition: all 0.3s ease;
+}
+
+/* Наведение → зелёная подсветка */
+.insp-check-label:hover .insp-icon::before {
+  opacity: 0.7;
+  color: #2e8f4e;
+  text-shadow: 0 0 5px rgba(46, 143, 78, 0.6);
+}
+
+/* Активная овация (чекбокс отмечен) */
+.insp-check-label input[type="checkbox"]:checked + .insp-icon::before {
+  opacity: 1;
+  color: #2e8f4e;
+  transform: scale(1.3);
+  animation: insp-flash 0.4s ease;
+}
+
+/* Потраченная овация (сняли галочку) */
+.insp-check-label input[type="checkbox"]:not(:checked) + .insp-icon::before {
+  opacity: 0.2;
+  color: #888;
+  transition: color 3s ease, opacity 3s ease;
+}
+
+/* Анимация "вспышки" */
+@keyframes insp-flash {
+  0%   { text-shadow: 0 0 5px #2e8f4e, 0 0 10px #2e8f4e; }
+  50%  { text-shadow: 0 0 20px #2e8f4e, 0 0 40px #2e8f4e; }
+  100% { text-shadow: none; }
+}
+
+
+/* ЖУРНАЛЫ ЗАПИСЕЙ */
+
+.additional-info-section {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  height: 100%;             /* растягивается на всё доступное окно */
+  flex: 1 1 auto;           /* занимает свободное место */
+  min-height: 200px;        /* нижний порог */
+  color: #ceccd0;
+}
+
+/* контейнер вкладок */
+.additional-info-section .sheet-tabs {
+  flex: 0 0 auto;           /* фиксированная высота (только сами кнопки) */
+  margin-bottom: 6px;
+  color: #cccccc;   
+}
+
+.additional-info-section .sheet-tabs .item {
+
+  color: #bbb;
+  border: 0px solid #444;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  text-decoration: none;   /* убираем подчёркивание ссылок */
+  display: inline-block;   /* делаем их кнопкоподобными */
+}
+
+.additional-info-section .sheet-tabs .item.active {
+  background: #422e53;
+  color: #fff;
+  border-color: #983e10;
+}
+
+.additional-info-section .sheet-tabs .item:hover {
+  background: #422e53;
+  color: #fff;
+}
+
+
+/* вкладка по умолчанию скрыта */
+.additional-info-section .tab {
+  display: none;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+/* активная вкладка */
+.additional-info-section .tab.active {
+  display: flex;   
+  
+}
+
+/* сам редактор */
+.additional-info-section prose-mirror {
+  flex: 1 1 auto;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 0px solid #bbb;
+  background: #ffffff51;
+  color: #ffffff;  
+  padding: 5px;
+  resize: none;             /* если хочешь запретить ручное растягивание */
+  overflow: auto;           /* скролл если текста больше чем высота */
+}
+
+/* Второй редактор черт характера */
+.info-split {
+  display: flex;
+  gap: 10px;
+  height: 100%;
+}
+
+.info-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-column.main-info {
+  flex: 2 1 auto;   /* 2/3 ширины */
+}
+
+.info-column.character-info {
+  flex: 1 1 auto;   /* 1/3 ширины */
+}
+
+.info-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #bbb;
+}
+
+.char-textarea {
+  flex: 1 1 auto;
+  resize: none;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #2f1f42;
+  color: #ddd;
+  padding: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* ФОБИИ */
 
 .actor-sheet .sheet-body {
   display: flex;
   flex-direction: column;
   height: 100%;
+
 }
 
 .inventory-section {
-  background: #f8f9fa;
-  border: 1px solid #ccc;
+  background: #36333c;
+  border: 0px solid #18131a;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   padding: 10px;
@@ -125,24 +409,33 @@
 }
 
 .inventory-list {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  /* ограничиваем высоту и даем скролл */
-  max-height: 200px; /* можно подогнать под твой экран */
-  overflow-y: auto;
+  list-style: disc;
+  padding-left: 20px;
+  margin: 5px 0;
+  color: #ccc;
+}
+
+.inventory-text {
+  margin-bottom: 3px;
+}
+
+.inventory-empty {
+  font-style: italic;
+  color: #777;
+  margin: 5px 0;
 }
 
 .inventory-title {
   margin: 0 0 8px 0;
   font-size: 1.1em;
   font-weight: bold;
+  color: #888;    
 }
 
 .inventory-row {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 5px;        
 }
 
 .drag-handle {
@@ -167,18 +460,25 @@
 
 .inventory-input {
   flex: 1;                /* занимает всё доступное место */
-  border-radius: 8px;
-  border: 1px solid #bbb;
+  border-radius: 0px;
+  border: 0px solid #bbb;
   padding: 5px;
+  background: #36333c00;
+  color: #000000;
   margin-right: 8px;      /* отступ до кнопки */
+}
+
+.inventory-input::placeholder {
+  color: #b4b4b4; /* меняешь на нужный */
+  opacity: 1;
 }
 
 .inventory-remove {
   flex: 0 0 30px;         /* фиксированная ширина */
   height: 30px;           /* фиксированная высота, чтобы не растягивалась */
   border-radius: 8px;
-  border: 1px solid #888;
-  background: #f5f5f5;
+  border: 0px solid #888;
+  background: #3c1f1f;
   cursor: pointer;
   text-align: center;
   padding: 0;
@@ -187,7 +487,7 @@
 }
 
 .inventory-remove:hover {
-  background: #e0e0e0;
+  background: #691919;
 }
 
 .inventory-add {
@@ -195,115 +495,18 @@
   padding: 6px 14px;
   margin-top: 5px;
   border-radius: 8px;
-  border: 1px solid #888;
-  background: #eee;
+  border: 0px solid #888;
+  background: #2d2336;
   cursor: pointer;
   transition: background 0.2s;
   align-self: flex-start; /* кнопка прижимается к контенту */  
+  color: #b6b6b6;
 }
 
 .inventory-add:hover {
-  background: #ddd;
+  background: #422e53;
 }
 
-.additional-info-section {
-  display: flex;
-  flex-direction: column;
-  font-weight: bold;
-  margin-bottom: 10px;
-  height: 100%;             /* растягивается на всё доступное окно */
-  flex: 1 1 auto;           /* занимает свободное место */
-  min-height: 200px;        /* нижний порог */
-}
-
-/* контейнер вкладок */
-.additional-info-section .sheet-tabs {
-  flex: 0 0 auto;           /* фиксированная высота (только сами кнопки) */
-  margin-bottom: 6px;
-}
-
-/* вкладка по умолчанию скрыта */
-.additional-info-section .tab {
-  display: none;
-  flex: 1 1 auto;
-  flex-direction: column;
-}
-
-/* активная вкладка */
-.additional-info-section .tab.active {
-  display: flex;
-}
-
-/* сам редактор */
-.additional-info-section prose-mirror {
-  flex: 1 1 auto;
-  width: 100%;
-  box-sizing: border-box;
-  border-radius: 8px;
-  border: 1px solid #bbb;
-  background: #ffffff51;
-  padding: 5px;
-  resize: none;             /* если хочешь запретить ручное растягивание */
-  overflow: auto;           /* скролл если текста больше чем высота */
-}
-
-.action-button-row {
-  margin-top: 8px;
-  text-align: left;
-    flex: 0 0 auto; /* не растягивается */
-}
-
-.action-button {
-  padding: 2px 2px;
-  border-radius: 8px;
-  border: 0px solid #ccc;
-  background: #2e8f4e;
-  cursor: pointer;
-  transition: background 0.2s;
-  flex: 0 0 auto; /* чтобы секция не тянулась по высоте */  
-}
-
-.action-button:hover {
-  background: #26b455;
-}
-
-.character-action {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  flex: 0 0 auto; /* чтобы секция не тянулась по высоте */    
-}
-
-.character-action label {
-  font-weight: bold;
-  display: block;
-  margin-bottom: 4px;
-}
-
-.character-action select {
-  width: 100%;
-  margin-bottom: 6px;
-}
-
-.character-action .action-buttons {
-  display: flex;
-  gap: 6px; /* расстояние между кнопками */
-}
-
-.character-action .action-buttons button {
-  flex: 1; /* каждая кнопка растягивается равномерно */
-  padding: 6px;
-  font-weight: bold;
-  border: 1px solid #888;
-  border-radius: 4px;
-  background-color: #222;
-  color: #fff;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.character-action .action-buttons button:hover {
-  background-color: #444;
-}
 
 /* --- NPC Лист --- */
 .npc-header {
@@ -324,11 +527,13 @@
   align-items: center;
   max-width: 120px;
   flex: 0 0 auto;
+  vertical-align: middle;  
 }
 .npc-portrait img {
   width: 100%;
   height: auto;
   border-radius: 8px;
+  vertical-align: middle;    
 }
 .npc-portrait .change-token-btn {
   margin-top: 5px;
